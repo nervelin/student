@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:context="http://www.springframework.org/schema/context"
+         xmlns:aop="http://www.springframework.org/schema/aop"
+         xmlns:tx="http://www.springframework.org/schema/tx"
+         xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context.xsd
+         http://www.springframework.org/schema/aop
+         http://www.springframework.org/schema/aop/spring-aop.xsd
+         http://www.springframework.org/schema/tx
+         http://www.springframework.org/schema/tx/spring-tx.xsd">
+         
+	<!-- 引入外部属性文件 -->
+	<context:property-placeholder location="classpath:db.properties"/>
+	
+	<!-- 配置c3p0连接池 -->
+	<bean id="dataSource" class=" com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${jdbcDriver}"></property>
+		<property name="jdbcUrl" value="${jdbcUrl}"></property>
+		<property name="user" value="${jdbcuser}"></property>
+		<property name="password" value="${jdbcpass}"></property>
+	</bean>
+	
+	<!-- 配置hibernate相关属性 -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<!-- 注入连接池 -->
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 配置hibernate属性 -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+			</props>
+		</property>
+	
+		<!-- 加载hibernate映射配置文件 -->
+		<property name="mappingResources">
+			<list>
+				<value>entity/College.hbm.xml</value>
+				<value>entity/Student.hbm.xml</value>
+			</list>
+		</property>
+	</bean>
+
+	<!--配置事务管理器-->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<!--开启注解事务-->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+	<!--action实例化-->
+	<bean id="collegeAction" class="action.CollegeAction" scope="prototype">
+		<property name="collegeService" ref="collegeService"></property>
+	</bean>
+	<bean id="studentAction" class="action.StudentAction" scope="prototype">
+		<property name="studentService" ref="studentService"></property>
+	</bean>
+	<!--service实例化-->
+	<bean id="collegeService" class="service.CollegeService">
+		<property name="collegeDao" ref="collegeDao"></property>
+	</bean>
+	<bean id="studentService" class="service.StudentService">
+		<property name="studentDao" ref="studentDao"></property>
+	</bean>
+	<!--dao实例化-->
+	<bean id="collegeDao" class="dao.CollegeDao">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<bean id="studentDao" class="dao.StudentDao">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+</beans>
+

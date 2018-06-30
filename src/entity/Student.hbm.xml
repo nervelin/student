@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2017-9-25 20:52:39 by Hibernate Tools 3.5.0.Final -->
+<hibernate-mapping>
+    <class name="entity.Student" table="student">
+        <id name="id" column="id">
+            <generator class="native"></generator>
+        </id>
+        <property name="studentname" column="studentname" />
+        <property name="sex" column="sex" />
+        <property name="major" column="major" />
+        <property name="phone" column="phone" />
+        <many-to-one name="college" class="entity.College" column="cid"/>
+    </class>
+</hibernate-mapping>
